@@ -1,5 +1,5 @@
 import { interval } from "rxjs";
-import { map, mergeMap, take } from "rxjs/operators";
+import { concatWith, map, mergeMap, switchMap, take } from "rxjs/operators";
 
 let outer = interval(1000).pipe(take(2));
 
@@ -7,12 +7,21 @@ let combined = outer.pipe(
   mergeMap((x) => {
     return interval(400).pipe(
       take(3),
-      map((y) => `outer ${x}: inner ${y}`)
+      map((y) => `result: outer ${x}: inner ${y}`)
     );
   })
 );
 
-combined.subscribe((result) => console.log(`result ${result} `));
+let combined2 = outer.pipe(
+  switchMap((x) => {
+    return interval(400).pipe(
+      take(3),
+      map((y) => `result2: outer ${x}: inner ${y}`)
+    );
+  })
+);
+
+combined.pipe(concatWith(combined2)).subscribe((result) => console.log(result));
 
 /*
  * Although the third value of the inner observable is emmited after the outer observable emits new value,
