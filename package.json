@@ -4,7 +4,8 @@
   "description": "RxJS 5 essentials",
   "author": "Yakov Fain",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
-    "rxjs": "5.1.0"
+    "rxjs": "^7.8.2"
   }
 }
