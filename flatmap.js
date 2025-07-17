@@ -1,48 +1,38 @@
-let {Observable} = require('rxjs/Observable');
-require('rxjs/add/observable/from');
-require('rxjs/add/operator/mergeMap'); // flatMap is an alias of mergeMap
+import { from, Observable } from "rxjs";
+import { mergeMap } from "rxjs/operators";
 
 function getDrinks() {
+  let beers = from([
+    { name: "Stella", country: "Belgium", price: 9.5 },
+    { name: "Sam Adams", country: "USA", price: 8.5 },
+    { name: "Bud Light", country: "USA", price: 6.5 },
+  ]);
 
-    let beers = Observable.from([
-        {name: "Stella", country: "Belgium", price: 9.50},
-        {name: "Sam Adams", country: "USA", price: 8.50},
-        {name: "Bud Light", country: "USA", price: 6.50}
-    ]);
+  let softDrinks = from([
+    { name: "Coca Cola", country: "USA", price: 1.5 },
+    { name: "Fanta", country: "USA", price: 1.5 },
+    { name: "Lemonade", country: "France", price: 2.5 },
+  ]);
 
-    let softDrinks = Observable.from([
-        {name: "Coca Cola", country: "USA", price: 1.50},
-        {name: "Fanta", country: "USA", price: 1.50},
-        {name: "Lemonade", country: "France", price: 2.50}
-    ]);
-
-    return Observable.create( observer => {
-
-            observer.next(beers);        // pushing the beer pallet (observable)
-            observer.next(softDrinks);   // pushing the soft drinks pallet (observable)
-            observer.complete();
-        }
-    );
+  return new Observable((observer) => {
+    observer.next(beers); // pushing the beer pallet (observable)
+    observer.next(softDrinks); // pushing the soft drinks pallet (observable)
+    observer.complete();
+  });
 }
 
 // We want to unload each pallet and print the into about each case with drinks
 
 getDrinks()
-    .flatMap(drinks => drinks)           // unloading drinks from pallets
-    .subscribe(
-        drink => console.log("Subscriber got " + drink.name + ": " + drink.price ),
-        error => console.err(error),
-        () => console.log("The stream of observables is over")
-    );
-
-
-
-
-
-
-
-
-
+  .pipe(
+    mergeMap((drinks) => drinks) // unloading drinks from pallets
+  )
+  .subscribe({
+    next: (drink) =>
+      console.log("Subscriber got " + drink.name + ": " + drink.price),
+    error: (error) => console.error(error),
+    complete: console.log("The stream of observables is over"),
+  });
 
 /*
  // AN alternative (bad) solution with nested subscribtions
@@ -58,4 +48,3 @@ getDrinks()
  );
 
  */
-
